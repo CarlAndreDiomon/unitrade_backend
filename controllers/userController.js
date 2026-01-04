@@ -99,6 +99,14 @@ const logoutUser = async (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private
+const getUsers = async (req, res) => {
+  const users = await User.find({}).select('-password');
+  res.status(200).json(users);
+};
+
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -111,4 +119,5 @@ export {
   loginUser,
   getMe,
   logoutUser,
+  getUsers,
 };

@@ -4,6 +4,13 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
+import postRoutes from './routes/postRoutes.js';
+import dns from 'dns';
+import https from 'https';
+
+// Force IPv4 to avoid IPv6 connection issues
+dns.setDefaultResultOrder('ipv4first');
+https.globalAgent.options.family = 4;
 
 // Load env vars
 dotenv.config();
@@ -28,6 +35,7 @@ app.get('/', (req, res) => {
 
 // Define Routes
 app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);
 
 const PORT = process.env.PORT || 5000;
 
