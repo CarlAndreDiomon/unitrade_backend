@@ -1,10 +1,13 @@
 import mongoose from 'mongoose';
 
-let isConnected = false;
-
 const connectDB = async () => {
-  if (isConnected) {
+  // Check if already connected (1 = connected, 2 = connecting)
+  if (mongoose.connection.readyState >= 1) {
     return;
+  }
+
+  if (!process.env.MONGO_URI) {
+    throw new Error('MONGO_URI is not defined in environment variables');
   }
 
   try {
@@ -12,7 +15,6 @@ const connectDB = async () => {
       serverSelectionTimeoutMS: 5000,
     });
 
-    isConnected = true;
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`Error: ${error.message}`);
