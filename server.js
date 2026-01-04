@@ -22,7 +22,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'https://carlandrediomon.github.io/UniTrade',
+  origin: 'https://carlandrediomon.github.io',
   credentials: true,
 }));
 app.use(express.json());
