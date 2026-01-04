@@ -7,6 +7,7 @@ import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import dns from 'dns';
 import https from 'https';
+import { fileURLToPath } from 'url';
 
 // Force IPv4 to avoid IPv6 connection issues
 dns.setDefaultResultOrder('ipv4first');
@@ -39,6 +40,10 @@ app.use('/api/posts', postRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+export default app;
