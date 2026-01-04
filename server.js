@@ -34,6 +34,11 @@ app.use(cookieParser());
 
 // Database Connection Middleware
 app.use(async (req, res, next) => {
+  // Skip DB connection for OPTIONS requests (preflight)
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   try {
     await connectDB();
     next();
