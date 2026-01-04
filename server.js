@@ -9,15 +9,14 @@ import dns from 'dns';
 import https from 'https';
 import { fileURLToPath } from 'url';
 
-// Force IPv4 to avoid IPv6 connection issues
-dns.setDefaultResultOrder('ipv4first');
-https.globalAgent.options.family = 4;
+// Force IPv4 to avoid IPv6 connection issues (Development only)
+if (process.env.NODE_ENV === 'development') {
+  dns.setDefaultResultOrder('ipv4first');
+  https.globalAgent.options.family = 4;
+}
 
 // Load env vars
 dotenv.config();
-
-// Connect to database
-connectDB();
 
 const app = express();
 
@@ -28,8 +27,21 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+app.options('*', cors()); // Enable pre-flight for all routes
+
 app.use(express.json());
 app.use(cookieParser());
+
+// Database Connection Middleware
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ message: 'Database connection error' });
+  }
+});
 
 // Routes
 app.get('/', (req, res) => {
@@ -39,6 +51,15 @@ app.get('/', (req, res) => {
 // Define Routes
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    message: err.message || 'Internal Server Error',
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 
