@@ -20,6 +20,18 @@ dotenv.config();
 
 const app = express();
 
+// Explicitly handle OPTIONS requests
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', 'https://carlandrediomon.github.io');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    return res.status(200).end();
+  }
+  next();
+});
+
 // Middleware
 app.use(cors({
   origin: ['https://carlandrediomon.github.io', 'http://localhost:5173'],
@@ -27,7 +39,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.options('*', cors()); // Enable pre-flight for all routes
 
 app.use(express.json());
 app.use(cookieParser());
